@@ -9,58 +9,112 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css" rel="stylesheet">
+
   <title>Twitter Data</title>
 </head>
 <body ng-app="app" ng-controller="mainController">
-  <div class="container">
-    <div class="row align-items-center">
+  <main role="main" class="container-fluid">
+    <div class="jumbotron jumbotron-fluid" style="background-color:#EC7000" >
+      <div class="container">
+        <h1 class="display-4" style="color: white">Twitter Hashtags</h1>
+        <p class="lead" style="color: white">Sumarizador de dados coletados sobre hashtags</p>
+      </div>
+    </div>
+    <div class="row align-items-start">
       <div class="col">
         <div class="card" style="width: 18rem;">
           <div class="card-body">
-            <h5 class="card-title">Exibir 5 usuários com mais seguidores</h5>
+            <div class="float-sm-right">
+              <button type="button" class="btn btn-success" ng-click="listUsers()">Listar</button>
+              <button type="button" class="btn btn-danger" ng-click="resetUsers()">Limpar</button>
+            </div><br><br>
+            <h5 class="card-title">5 usuários com mais seguidores</h5>
             <div class="list-group">
               <table class="table table-hover">
                 <thead>
                   <tr>
+                    <th scope="col">Usuário</th>
                     <th scope="col">Seguidores</th>
-                    <th scope="col">Nickname</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat="users in usersList">
-                    <td>{{users.followers}}</td>
                     <td>{{users.screen_name}}</td>
+                    <td>{{users.followers}}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <button type="button" class="btn btn-success" ng-click="listUsers()">Buscar</button>
-            <button type="button" class="btn btn-danger" ng-click="resetUsers()">Limpar</button>
           </div>
         </div>
       </div>
       <div class="col">
         <div class="card" style="width: 18rem;">
           <div class="card-body">
-            <h5 class="card-title">Listar a quantidade de postagens por hora do dia</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="card-link">Buscar</a>
-            <a href="#" class="card-link">Limpar</a>
+            <div class="float-sm-right">
+              <button type="button" class="btn btn-success" ng-click="listTweetsPerHour()">Listar</button>
+              <button type="button" class="btn btn-danger" ng-click="resetTweetsPerHour()">Limpar</button>
+            </div><br><br>
+            <h5 class="card-title">Postagens por hora do dia</h5>
+            <div class="list-group">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Hora do dia</th>
+                    <th scope="col">Postagens</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="tweetsPerHour in tweetsPerHourList">
+                    <td>{{tweetsPerHour.dayHour}}</td>
+                    <td>{{tweetsPerHour.count}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
       <div class="col">
-        <div class="card" style="width: 18rem;">
+        <div class="card" style="width: 35rem;">
           <div class="card-body">
-            <h5 class="card-title">Listar a quantidade de postagens para cada hashtag de acordo com o idioma e localização</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="card-link">Buscar</a>
-            <a href="#" class="card-link">Limpar</a>
+            <div class="float-sm-right">
+              <button type="button" class="btn btn-success" ng-click="listTweetsPerHashtag()">Listar</button>
+              <button type="button" class="btn btn-danger" ng-click="resetTweetsPerHashtag()">Limpar</button>
+            </div><br><br>
+            <h5 class="card-title">Postagens para cada hashtag de acordo com o idioma e localização</h5>
+            <div class="list-group">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Hashtag</th>
+                    <th scope="col">Postagens</th>
+                    <th scope="col">Idioma</th>
+                    <th scope="col">Localização</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="tweetsPerHashtag in tweetsPerHashtagList">
+                    <td>{{tweetsPerHashtag.hashtag}}</td>
+                    <td>{{tweetsPerHashtag.count}}</td>
+                    <td>{{tweetsPerHashtag.lang}}</td>
+                    <td>{{tweetsPerHashtag.location}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
+  <footer class="footer">
+    <div class="container-fluid">
+      <span class="text-muted">Criado por Fabrício Borgatto</span>
+    </div>
+  </footer>
 
   <script>
     var app = angular.module('app', []);
@@ -82,6 +136,44 @@
       $scope.resetUsers = function() {
 
         $scope.usersList = "";
+        
+      };
+
+      $scope.listTweetsPerHour = function() {
+
+        $http({
+          method: "GET",
+          url: "http://localhost:8080/v1/tweets/count",
+          params: {filter: 'perHour'}
+        }).then(function success(response){
+          $scope.tweetsPerHourList = response.data.tweets;
+        }, function error(response){
+
+        });
+      };
+
+      $scope.resetTweetsPerHour = function() {
+
+        $scope.tweetsPerHourList = "";
+        
+      };
+
+      $scope.listTweetsPerHashtag = function() {
+
+        $http({
+          method: "GET",
+          url: "http://localhost:8080/v1/tweets/count",
+          params: {filter: 'perHashtagLangAndLocation'}
+        }).then(function success(response){
+          $scope.tweetsPerHashtagList = response.data.tweets;
+        }, function error(response){
+
+        });
+      };
+
+      $scope.resetTweetsPerHashtag = function() {
+
+        $scope.tweetsPerHashtagList = "";
         
       };
     });
