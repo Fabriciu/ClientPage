@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <title>Twitter Data</title>
+</head>
+<body ng-app="app" ng-controller="mainController">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Exibir 5 usuários com mais seguidores</h5>
+            <div class="list-group">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Seguidores</th>
+                    <th scope="col">Nickname</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="users in usersList">
+                    <td>{{users.followers}}</td>
+                    <td>{{users.screen_name}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <button type="button" class="btn btn-success" ng-click="listUsers()">Buscar</button>
+            <button type="button" class="btn btn-danger" ng-click="resetUsers()">Limpar</button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Listar a quantidade de postagens por hora do dia</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="card-link">Buscar</a>
+            <a href="#" class="card-link">Limpar</a>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card" style="width: 18rem;">
+          <div class="card-body">
+            <h5 class="card-title">Listar a quantidade de postagens para cada hashtag de acordo com o idioma e localização</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="card-link">Buscar</a>
+            <a href="#" class="card-link">Limpar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var app = angular.module('app', []);
+    app.controller('mainController', function($scope, $http) {
+
+      $scope.listUsers = function() {
+
+        $http({
+          method: "GET",
+          url: "http://localhost:8080/v1/users/mostFollowed",
+          params: {count: 5}
+        }).then(function success(response){
+          $scope.usersList = response.data.users;
+        }, function error(response){
+
+        });
+      };
+
+      $scope.resetUsers = function() {
+
+        $scope.usersList = "";
+        
+      };
+    });
+  </script>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
